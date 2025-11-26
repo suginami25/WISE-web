@@ -1,0 +1,94 @@
+<!--
+============================================================
+ ファイル名      : index.html
+ 役割           : 同期会アルバムビューア（PAAS）の入口となるHTML。
+                   - 第1画面：カテゴリ一覧
+                   - 第2画面：サムネイル一覧（カテゴリ配下をグループごと）
+                   - 第3画面：拡大表示
+ バージョン     : v0.5(Fix)
+ 作成日         : 2025-11-24
+ 更新日         : 2025-11-24
+ 保存先         : /Users/yoichiamano/Projects/Album_Viewer/PAAS/
+
+ 実行方法       :
+   1. Finder で index.html をダブルクリックする
+      （既定ブラウザで開けばOK。ローカルファイルで動作）
+   2. 同じフォルダに style.css / viewer.js / photos_index.js が
+      置かれていることを確認する。
+
+ 前提フォルダ構成:
+   /Users/yoichiamano/Projects/Album_Viewer/
+       └── PAAS/
+             ├── index.html          ← このファイル
+             ├── style.css
+             ├── viewer.js
+             ├── photos_index.js     ← Photo_index_Generater で自動生成
+             └── assets/
+                   └── logo_suginami.jpg  ← 杉並高校 校章画像
+
+ 注意事項:
+   - JavaScript を有効にしたブラウザで開くこと。
+   - スマートフォンではサムネイル3列、PCでは9列表示を想定。
+============================================================
+-->
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>同期会アルバムビューア</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="photos_index.js"></script>
+  <script defer src="viewer.js"></script>
+</head>
+<body>
+  <!-- ヘッダ：黒帯＋校章ロゴ＋中央寄せタイトル -->
+  <header class="app-header">
+    <div class="app-header-inner">
+      <img
+        src="assets/logo_suginami.jpg"
+        alt="杉並高校 校章"
+        class="app-logo"
+      />
+      <span class="app-title-text">2025年杉並高校25期同期会アルバム</span>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <!-- 第1画面：カテゴリ一覧（メインボタン群を中央配置） -->
+    <section id="screen-category" class="screen screen-active">
+      <div class="category-screen-inner">
+        <h2 class="screen-title screen-title-center">カテゴリを選んでください</h2>
+        <div id="category-list" class="category-list"></div>
+      </div>
+    </section>
+
+    <!-- 第2画面：サムネイル一覧（カテゴリ配下をグループごと） -->
+    <section id="screen-gallery" class="screen screen-hidden">
+      <h2 id="gallery-title" class="screen-title"></h2>
+      <div id="gallery-container" class="gallery-container"></div>
+    </section>
+
+ <!-- 第3画面：拡大表示 -->
+<section id="screen-viewer" class="screen screen-hidden">
+
+  <!-- ★ 第3画面専用の「閉じる」ボタンは不要のため削除 -->
+  <div class="viewer-header"></div>
+
+  <div class="viewer-body">
+    <img id="viewer-image" class="viewer-image" src="" alt="" />
+    <p id="viewer-filename" class="viewer-filename"></p>
+    <p id="viewer-context" class="viewer-context"></p>
+  </div>
+
+  <!-- ★ 右下に固定表示される「戻る（🔙）」ボタン -->
+  <div class="back-button">🔙</div>
+
+</section>
+  </main>
+
+  <!-- 共通：左下固定の🏠ボタン（第2・第3画面用） -->
+  <button id="home-button" type="button" class="home-button">🏠</button>
+</body>
+</html>

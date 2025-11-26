@@ -1,0 +1,317 @@
+/*
+============================================================
+ ファイル名      : style.css
+ 役割           : 同期会アルバムビューアの見た目（レイアウト・配色）
+                   - 第1画面：カテゴリ一覧（中央配置ボタン）
+                   - 第2画面：サムネイル一覧（PC9列 / スマホ3列）
+                   - 第3画面：黒背景＋写真中央表示＋下部白スペース＋🏠/🔙
+ バージョン     : v1.2(Fix)
+ 作成日         : 2025-11-24
+ 更新日         : 2025-11-24
+   - 第3画面の黒背景高さを 100vh - 150px で厳密固定
+   - 写真表示領域の最大高さを「黒背景高 − 80px」で精密制御
+   - 写真＋キャプションを黒背景内で縦横とも中央揃え
+   - 🔙 ボタンは class="back-button" 前提で右下白スペース内に固定
+ 保存先         : /Users/yoichiamano/Projects/Album_Viewer/PAAS/
+
+ 前提:
+   - 同フォルダに index.html / viewer.js / photos_index.js / assets/ が存在すること
+   - index.html の第3画面は以下の構造を前提とする：
+       <section id="screen-viewer" class="screen screen-hidden">
+         <div class="viewer-header"></div>
+         <div class="viewer-body">
+           <img id="viewer-image" class="viewer-image" ... />
+           <p id="viewer-filename" class="viewer-filename"></p>
+           <p id="viewer-context" class="viewer-context"></p>
+         </div>
+         <div class="back-button">🔙</div>
+       </section>
+============================================================
+*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial,
+    "YuGothic", "Yu Gothic", "ヒラギノ角ゴ ProN", "Hiragino Kaku Gothic ProN",
+    "メイリオ", Meiryo, sans-serif;
+  background: #f5f5f5;
+  color: #333;
+}
+
+/* ----------------------------------------------------------
+   ヘッダー
+---------------------------------------------------------- */
+
+.app-header {
+  background: #000;
+  color: #fff;
+  padding: 0.4rem 1rem;
+  height: 60px; /* 固定高さ：以後の計算に使用 */
+}
+
+.app-header-inner {
+  max-width: 1200px;
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.app-logo {
+  height: 40px;
+  width: auto;
+}
+
+.app-title-text {
+  font-size: 1.4rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ----------------------------------------------------------
+   メイン領域（下部白スペース 90px 固定）
+---------------------------------------------------------- */
+
+.app-main {
+  padding-bottom: 90px; /* 画面下に常に 90px の白スペースを確保（🏠・🔙 用） */
+}
+
+/* ----------------------------------------------------------
+   画面切替
+---------------------------------------------------------- */
+
+.screen {
+  display: none;
+}
+
+.screen-active {
+  display: block;
+}
+
+/* ----------------------------------------------------------
+   第1画面
+---------------------------------------------------------- */
+
+#screen-category {
+  min-height: calc(100vh - 60px);
+}
+
+.category-screen-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+}
+
+.category-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.category-card {
+  min-width: 180px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.95rem;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+  transition: 0.1s ease;
+}
+
+.category-card:hover {
+  background: #f8f8f8;
+  transform: translateY(-1px);
+}
+
+/* ----------------------------------------------------------
+   第2画面
+---------------------------------------------------------- */
+
+.gallery-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.75rem 1rem 1.5rem;
+}
+
+.gallery-group-title {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+@media (min-width: 900px) {
+  .gallery-grid {
+    grid-template-columns: repeat(9, 1fr);
+  }
+}
+
+.thumb {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 2px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.thumb img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: contain;
+  background: #fff;
+}
+
+.thumb-filename {
+  margin-top: 2px;
+  padding: 0 2px;
+  font-size: 0.65rem;
+  line-height: 1.2;
+  text-align: right;
+}
+
+/* ----------------------------------------------------------
+   第3画面（黒い領域：精密中央配置）
+---------------------------------------------------------- */
+
+/*
+  黒い表示領域の高さ = 画面全体 100vh
+                     − ヘッダー 60px
+                     − 下部白スペース 90px
+                     = 100vh − 150px
+*/
+
+#screen-viewer {
+  background: #111;
+  height: calc(100vh - 150px);  /* 黒い領域を厳密に固定 */
+  display: flex;
+  align-items: center;          /* 黒領域内で viewer-body を縦中央 */
+  justify-content: center;      /* 黒領域内で viewer-body を横中央 */
+  position: relative;           /* 🔙 の基準ではなく、黒領域自体のレイヤー制御用 */
+}
+
+/* 旧ヘッダは使用しないが、構造維持のため空にしておく */
+.viewer-header {
+  display: none;
+}
+
+/* 黒領域いっぱいを使って「画像＋テキスト」の中央を精密に制御 */
+.viewer-body {
+  text-align: center;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;      /* 画像＋テキスト全体を黒領域の中央へ */
+  height: 100%;                 /* 黒領域の全高を占有して中央計算を安定させる */
+}
+
+/*
+  写真の最大高さ = 黒い領域の高さ − 予備領域 80px
+    黒い領域      : 100vh − 150px
+    予備（文字等）: 80px
+    → max-height = 100vh − (150px + 80px) = 100vh − 230px
+  これにより、どの画面サイズでも
+    - 黒い領域からはみ出さない
+    - 画像下にファイル名＋キャプションぶんのスペースが残る
+*/
+
+.viewer-image {
+  max-width: 78%;
+  max-height: calc(100vh - 230px);
+  border: 1px solid #444;
+  border-radius: 6px;
+  background: #000;
+}
+
+.viewer-filename {
+  margin: 0.75rem 0 0.15rem;
+  font-size: 0.85rem;
+  color: #fff;
+}
+
+.viewer-context {
+  font-size: 0.8rem;
+  color: #bbb;
+}
+
+/* ----------------------------------------------------------
+   左下：🏠
+---------------------------------------------------------- */
+
+.home-button {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  cursor: pointer;
+  z-index: 2000;
+}
+
+/* ----------------------------------------------------------
+   右下：🔙（class="back-button" を前提）
+   - 画面右下の白スペース 90px の中に常に収まる
+   - position: fixed でスクロール・画面切替に影響されない
+---------------------------------------------------------- */
+
+.back-button {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;       /* 下部白スペース（90px）の中に確実に入る位置 */
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  z-index: 2000;
+}
+
+.back-button:hover {
+  background: #f0f0f0;
+}
